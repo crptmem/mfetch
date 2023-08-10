@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/sysinfo.h>
 #include <sys/utsname.h>
 
 #define BBLACK   "\033[1;30m"
@@ -48,13 +50,42 @@ int main() {
   if(uname(&unameData))
     fprintf(stderr, "uname(&unameData) != 0"); 
 
-  printf("%s   \n", info.col1);
-  printf("%s  %s%s%s\n", info.col2, BYELLOW, "kernel " WHITE, unameData.release);
-  printf("%s\n", info.col3);
-  printf("%s\n", info.col4);
-  printf("%s\n", info.col5);
+  int days, hours, mins;
+  struct sysinfo sys_info;
+  char *user_buf;
+  user_buf = (char*)malloc(10 * sizeof(char));
+  user_buf = getlogin();
+
+  char *hostname = (char*)malloc(512);
+  gethostname(hostname, 512);
+
+  FILE *fp;
+  char path[1035];
+
+  fp = popen("cat /etc/*-release | egrep \"PRETTY_NAME\" | cut -d = -f 2 | tr -d '\"' | tac | tr '\n' ' '", "r");
+  if (fp == NULL) {
+    printf("Failed to run command\n" );
+    exit(1);
+  }
+
+  while (fgets(path, sizeof(path), fp) != NULL) {}
+
+  pclose(fp);
+ 
+  sysinfo(&sys_info);
+
+  hours = sys_info.uptime / 3600;
+  mins = (sys_info.uptime / 60) - (hours * 60);
+
+
+  printf("%s  %s%s%s%s%s%s%s\n", info.col1, BYELLOW, user_buf, BRED, "@", BBLUE, hostname, BLACK);
+  printf("%s  %s%s%s%s\n", info.col2, BYELLOW, "kernel " WHITE, unameData.release, BLACK);
+  printf("%s  %s%s%s%s%s\n", info.col3, BYELLOW, " os     ", WHITE, path, BLACK);
+  printf("%s  %s%s%s%luM%s\n", info.col4, BYELLOW, "ram    ", WHITE, (sys_info.totalram / 1024) / 1024, BLACK);
+  printf("%s  %s%s%s%d%s%d%s\n", info.col5, BYELLOW, "uptime  ", WHITE, hours, "h ", mins, "m");
   printf("%s\n", info.col6);
   printf("%s\n", info.col7);
   printf("%s\n", info.col8);
 
+  free(hostname);
 }
