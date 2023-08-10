@@ -47,7 +47,7 @@ int main() {
   struct utsname unameData;
   int days, hours, mins;
   struct sysinfo sys_info;
-  char *user_buf = malloc(10 * sizeof(char));
+  char *user_buf = getlogin();
   char *pretty_name_buf = malloc(1024);
 
   sysinfo(&sys_info);
@@ -57,7 +57,7 @@ int main() {
     exit(1);
   }
 
-  user_buf = getlogin();
+  //user_buf = getlogin();
 
   hours = sys_info.uptime / 3600;
   mins = (sys_info.uptime / 60) - (hours * 60);
@@ -71,4 +71,5 @@ int main() {
   printf("%s\n", info.col7);
   printf("%s\n", info.col8);
 
+  free(pretty_name_buf);
 }
