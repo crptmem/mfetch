@@ -10,7 +10,8 @@
 #define BBLUE    "\033[1;34m"
 #define BWHITE   "\033[1;37m"
 #define WHITE   "\033[0;37m"
-
+#define BLACK   "\033[0;30m"
+#define BYELLOW  "\033[1;33m"
 #define RESET "\033[0;m"
 
 struct tux {
