@@ -18,8 +18,6 @@ struct tux {
 	char *col1, *col2, *col3, *col4, *col5, *col6, *col7, *col8;
 };
 
-struct utsname unameData;
-
 struct tux info = {
 	.col1 = "\033[0;30m      ___     ",
 	.col2 = "     (\033[0;37m..\033[0;30m \\    ",
@@ -33,25 +31,23 @@ struct tux info = {
 
 
 int main() {
-
-  if(uname(&unameData))
-    fprintf(stderr, "uname(&unameData) != 0"); 
+  struct utsname unameData;
+  if(uname(&unameData)) {
+    fprintf(stderr, "uname(&unameData) != 0");
+    exit(1);
+  }
 
   int days, hours, mins;
   struct sysinfo sys_info;
-  char *user_buf;
-  user_buf = (char*)malloc(10 * sizeof(char));
+  char *user_buf = (char*)malloc(10 * sizeof(char));
   user_buf = getlogin();
 
-  char *hostname = (char*)malloc(512);
-  gethostname(hostname, 512);
-
   FILE *fp;
-  char path[1035];
+  char *path = malloc(1024);
 
   fp = popen("cat /etc/*-release | egrep \"PRETTY_NAME\" | cut -d = -f 2 | tr -d '\"' | tac | tr '\n' ' '", "r");
   if (fp == NULL) {
-    printf("Failed to run command\n" );
+    fprintf(stderr, "fp == NULL");
     exit(1);
   }
 
@@ -65,7 +61,7 @@ int main() {
   mins = (sys_info.uptime / 60) - (hours * 60);
 
 
-  printf("%s  %s%s%s%s%s%s%s\n", info.col1, BYELLOW, user_buf, BRED, "@", BBLUE, hostname, BLACK);
+  printf("%s  %s%s%s%s%s%s%s\n", info.col1, BYELLOW, user_buf, BRED, "@", BBLUE, unameData.nodename, BLACK);
   printf("%s  %s%s%s%s\n", info.col2, BYELLOW, "kernel " WHITE, unameData.release, BLACK);
   printf("%s  %s%s%s%s%s\n", info.col3, BYELLOW, " os     ", WHITE, path, BLACK);
   printf("%s  %s%s%s%luM%s\n", info.col4, BYELLOW, "ram    ", WHITE, (sys_info.totalram / 1024) / 1024, BLACK);
@@ -74,5 +70,5 @@ int main() {
   printf("%s\n", info.col7);
   printf("%s\n", info.col8);
 
-  free(hostname);
+  free(path);
 }
