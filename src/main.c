@@ -9,10 +9,10 @@
 #define BRED     "\033[1;31m"
 #define BBLUE    "\033[1;34m"
 #define BWHITE   "\033[1;37m"
-#define WHITE   "\033[0;37m"
-#define BLACK   "\033[0;30m"
+#define WHITE    "\033[0;37m"
+#define BLACK    "\033[0;30m"
 #define BYELLOW  "\033[1;33m"
-#define RESET "\033[0;m"
+#define RESET    "\033[0;m"
 
 struct tux {
 	char *col1, *col2, *col3, *col4, *col5, *col6, *col7, *col8;
@@ -29,21 +29,8 @@ struct tux info = {
 	.col8 = "",
 };
 
-
-int main() {
-  struct utsname unameData;
-  if(uname(&unameData)) {
-    fprintf(stderr, "uname(&unameData) != 0");
-    exit(1);
-  }
-
-  int days, hours, mins;
-  struct sysinfo sys_info;
-  char *user_buf = (char*)malloc(10 * sizeof(char));
-  user_buf = getlogin();
-
+void get_pretty_name(char *buf){
   FILE *fp;
-  char *path = malloc(1024);
 
   fp = popen("cat /etc/*-release | egrep \"PRETTY_NAME\" | cut -d = -f 2 | tr -d '\"' | tac | tr '\n' ' '", "r");
   if (fp == NULL) {
@@ -51,24 +38,37 @@ int main() {
     exit(1);
   }
 
-  while (fgets(path, sizeof(path), fp) != NULL) {}
+  while (fgets(buf, sizeof(buf), fp) != NULL) {}
 
   pclose(fp);
- 
+}
+
+int main() {
+  struct utsname unameData;
+  int days, hours, mins;
+  struct sysinfo sys_info;
+  char *user_buf = malloc(10 * sizeof(char));
+  char *pretty_name_buf = malloc(1024);
+
   sysinfo(&sys_info);
+  get_pretty_name(pretty_name_buf);
+  if(uname(&unameData)) {
+    fprintf(stderr, "uname(&unameData) != 0");
+    exit(1);
+  }
+
+  user_buf = getlogin();
 
   hours = sys_info.uptime / 3600;
   mins = (sys_info.uptime / 60) - (hours * 60);
 
-
   printf("%s  %s%s%s%s%s%s%s\n", info.col1, BYELLOW, user_buf, BRED, "@", BBLUE, unameData.nodename, BLACK);
   printf("%s  %s%s%s%s\n", info.col2, BYELLOW, "kernel " WHITE, unameData.release, BLACK);
-  printf("%s  %s%s%s%s%s\n", info.col3, BYELLOW, " os     ", WHITE, path, BLACK);
+  printf("%s  %s%s%s%s%s\n", info.col3, BYELLOW, " os     ", WHITE, pretty_name_buf, BLACK);
   printf("%s  %s%s%s%luM%s\n", info.col4, BYELLOW, "ram    ", WHITE, (sys_info.totalram / 1024) / 1024, BLACK);
   printf("%s  %s%s%s%d%s%d%s\n", info.col5, BYELLOW, "uptime ", WHITE, hours, "h ", mins, "m");
   printf("%s\n", info.col6);
   printf("%s\n", info.col7);
   printf("%s\n", info.col8);
 
-  free(path);
 }
