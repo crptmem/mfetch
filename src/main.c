@@ -82,7 +82,7 @@ int main() {
   printf("%s  %s%s%s%s\n", info.col2, BYELLOW, "kernel " WHITE, unameData.release, BLACK);
   printf("%s  %s%s%s%s%s\n", info.col3, BYELLOW, " os     ", WHITE, path, BLACK);
   printf("%s  %s%s%s%luM%s\n", info.col4, BYELLOW, "ram    ", WHITE, (sys_info.totalram / 1024) / 1024, BLACK);
-  printf("%s  %s%s%s%d%s%d%s\n", info.col5, BYELLOW, "uptime  ", WHITE, hours, "h ", mins, "m");
+  printf("%s  %s%s%s%d%s%d%s\n", info.col5, BYELLOW, "uptime ", WHITE, hours, "h ", mins, "m");
   printf("%s\n", info.col6);
   printf("%s\n", info.col7);
   printf("%s\n", info.col8);
