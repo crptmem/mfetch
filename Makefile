@@ -1,7 +1,7 @@
 objects := $(patsubst %.c,%.o,$(wildcard src/*.c))
 
 all: $(objects)
-	mkdir bin
+	rm -rf bin && mkdir bin
 	gcc -o bin/mfetch $(objects)
 
 install:
